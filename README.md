@@ -1,5 +1,7 @@
-# server_autoreload
-Live reload utility for Go web servers 
+# Live Reload
+Live reload utility for Go/Nim web servers 
+
+Watch Files -> Restart Process
 
 ## Install
 ```bash
