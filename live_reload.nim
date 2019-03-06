@@ -20,11 +20,12 @@ proc main() =
     for file in walkDirRec ".":
       # if file.endsWith ".go":
       if not file.startsWith exclude_dir:
-        if (
+        if code_is_new == false and (
           now_unixtime - file.getLastModificationTime.toUnix
                 ) < 3:
           # echo file
           code_is_new = true
+          sleep(1000)
 
     if code_is_new or code_init:
       while server_running:
