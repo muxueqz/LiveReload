@@ -1,33 +1,30 @@
 import threadpool
 import os, times, strutils, osproc, streams
 
-proc async_read_process(fd: Stream)  =
-  for line in fd.lines:
-    echo line
-  # echo fd.readAll
-  # return fd.readAll
-setMaxPoolSize(1)
-setMinPoolSize(1)
-
 var
   server_running = false
   p: Process
   code_is_new = false
   code_init = true
+  cmds = commandLineParams()
+  exclude_dir = cmds[0]
+
+proc async_read_process(fd: Stream)  =
+  for line in fd.lines:
+    echo line
 
 proc main() =
   while true:
     var now_unixtime = getTime().toUnix
    
     for file in walkDirRec ".":
-      if file.endsWith ".go":
+      # if file.endsWith ".go":
+      if not file.startsWith exclude_dir:
         if (
           now_unixtime - file.getLastModificationTime.toUnix
                 ) < 3:
           # echo file
           code_is_new = true
-
-    # echo (now_unixtime, code_is_new)
 
     if code_is_new or code_init:
       while server_running:
@@ -37,19 +34,13 @@ proc main() =
         server_running = running p
         echo ("terminate end", running p, processID p)
 
-      var cmds = commandLineParams()
-      # for i in commandLineParams():
-        # if
-        # echo i
-      # var cmd = join(cmds, " ")
-      # p = startProcess(cmd, options={
-      p = startProcess(cmds[0], options={
+      p = startProcess(cmds[1], options={
         # poEvalCommand,
         poUsePath,
         poInteractive,
         poStdErrToStdOut,
         },
-        args = cmds[1..cmds.len - 1]
+        args = cmds[2..cmds.len - 1]
         )
       var fd = p.outputStream
       spawn async_read_process(fd)

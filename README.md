@@ -3,10 +3,11 @@ Live reload utility for Go web servers
 
 ## Install
 ```bash
-nim c --threads:on -r server_autoreload.nim
+nim c --threads:on live_reload.nim
 ```
 
 ## Use
 ```bash
-./server_autoreload go run
+#exclude ./build/
+./live_reload ./build/ go run
 ```
