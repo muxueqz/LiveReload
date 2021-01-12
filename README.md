@@ -11,5 +11,5 @@ nim c --threads:on live_reload.nim
 ## Use
 ```bash
 #exclude ./build/
-./live_reload ./build/ go run
+./live_reload --exclude ./build/ go run
 ```
