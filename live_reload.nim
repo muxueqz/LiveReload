@@ -1,3 +1,4 @@
+import re
 import threadpool
 import os, times, strutils, osproc, streams
 import docopt
@@ -13,7 +14,7 @@ Usage:
 Options:
   -h --help     Show this screen.
   --version     Show version.
-  --exclude FILE   Exclude Path
+  --exclude PATH   Exclude Path, Support Regex
 """
 
 
@@ -47,7 +48,8 @@ proc main() =
       # if file.endsWith ".go":
       var skip_file = false
       for i in exclude_paths:
-        if file.startsWith i:
+        if match(file, re i):
+        # if file.startsWith i:
           skip_file = true
       if code_is_new == false and
         skip_file == false and 
