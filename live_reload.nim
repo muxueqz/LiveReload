@@ -1,7 +1,8 @@
 import re
 import threadpool
-import os, times, strutils, osproc, streams
+import os, times, osproc, streams
 import docopt
+import psutil, posix
 
 let doc = """
 Live Reload.
@@ -36,6 +37,13 @@ for c in args["<cmd>"]:
 
 echo "cmd:":cmds
 
+proc kill_childpids_by_pgid() =
+  var pgid = getCurrentProcessId()
+  for p in psutil.pids():
+    var p_pgid = getpgid p.Pid
+    if p_pgid == pgid and p.Pid != pgid:
+      discard kill(p.Pid, SIGTERM)
+
 proc async_read_process(fd: Stream)  =
   for line in fd.lines:
     echo line
@@ -62,6 +70,7 @@ proc main() =
 
     if code_is_new or code_init:
       while server_running:
+        kill_childpids_by_pgid()
         terminate p
         echo ("terminate", running p, processID p)
         sleep(1000)
