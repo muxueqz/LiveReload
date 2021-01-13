@@ -36,12 +36,14 @@ for c in args["<cmd>"]:
   cmds.add c
 
 echo "cmd:":cmds
+var pgid = getCurrentProcessId().Pid
+discard setpgid(pgid, pgid)
 
 proc kill_childpids_by_pgid() =
-  var pgid = getCurrentProcessId()
   for p in psutil.pids():
     var p_pgid = getpgid p.Pid
     if p_pgid == pgid and p.Pid != pgid:
+      echo "Kill:", p.Pid
       discard kill(p.Pid, SIGTERM)
 
 proc async_read_process(fd: Stream)  =
@@ -71,8 +73,8 @@ proc main() =
     if code_is_new or code_init:
       while server_running:
         kill_childpids_by_pgid()
-        terminate p
-        echo ("terminate", running p, processID p)
+        # terminate p
+        # echo ("terminate", running p, processID p)
         sleep(1000)
         server_running = running p
         echo ("terminate end", running p, processID p)
