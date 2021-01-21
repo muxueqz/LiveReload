@@ -3,19 +3,21 @@ import threadpool
 import os, times, osproc, streams
 import docopt
 import psutil, posix
+import strutils
 
 let doc = """
 Live Reload.
 
 Usage:
-  live_reload (--exclude=<path>)... <cmd> ...
+  live_reload [--shell] [--exclude=<path>]... <cmd> ...
   live_reload (-h | --help)
   live_reload --version
 
 Options:
   -h --help     Show this screen.
   --version     Show version.
-  --exclude PATH   Exclude Path, Support Regex
+  --shell       Enable Shell commands.
+  --exclude PATH   Exclude Path, Support Regex.
 """
 
 
@@ -29,6 +31,7 @@ var
   code_init = true
   exclude_paths = args["--exclude"]
   cmds = newSeq[string]()
+echo args
 
 echo "Exclude Paths:":exclude_paths
 
@@ -79,14 +82,23 @@ proc main() =
         server_running = running p
         echo ("terminate end", running p, processID p)
 
-      p = startProcess(cmds[0], options={
-        # poEvalCommand,
-        poUsePath,
-        poInteractive,
-        poStdErrToStdOut,
-        },
-        args = cmds[1..cmds.len - 1]
-        )
+      if args["--shell"]:
+        p = startProcess(cmds.join(" "), options={
+          poEvalCommand,
+          poUsePath,
+          poInteractive,
+          poStdErrToStdOut,
+          },
+          )
+      else:
+        p = startProcess(cmds[0], options={
+          # poEvalCommand,
+          poUsePath,
+          poInteractive,
+          poStdErrToStdOut,
+          },
+          args = cmds[1..cmds.len - 1]
+          )
       var fd = p.outputStream
       spawn async_read_process(fd)
       echo ("running", running p, processID p)
