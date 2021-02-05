@@ -5,11 +5,13 @@ import docopt
 import psutil, posix
 import strutils
 
+  # live_reload [--exclude=<path>]... [--] <cmd>...
+  # live_reload [--] <cmd>... [--shell] [--exclude=<path>]...
 let doc = """
 Live Reload.
 
 Usage:
-  live_reload [--shell] [--exclude=<path>]... <cmd> ...
+  live_reload [--shell] [--exclude=<path>] ... <cmd> ...
   live_reload (-h | --help)
   live_reload --version
 
